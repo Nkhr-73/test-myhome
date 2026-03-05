@@ -82,6 +82,7 @@ button:hover{
   margin-left:10px;
   background:#ff3b30;
 }
+
 </style>
 </head>
 
@@ -95,6 +96,9 @@ button:hover{
 
 <button onclick="addCategory()">カテゴリー追加</button>
 <button onclick="addLink()">リンク追加</button>
+<button onclick="backupData()">バックアップ保存</button>
+<button onclick="restoreData()">バックアップ復元</button>
+<input type="file" id="fileInput" style="display:none">
 
 <div id="categories"></div>
 
@@ -190,6 +194,49 @@ function addLink(){
 
   save();
   render();
+
+}
+  function backupData(){
+
+  const json = JSON.stringify(data);
+
+  const blob = new Blob([json], {type:"application/json"});
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = "myhome-backup.json";
+
+  a.click();
+
+}
+
+function restoreData(){
+
+  const input = document.getElementById("fileInput");
+
+  input.click();
+
+  input.onchange = function(){
+
+    const file = input.files[0];
+
+    const reader = new FileReader();
+
+    reader.onload = function(){
+
+      data = JSON.parse(reader.result);
+
+      save();
+      render();
+
+    };
+
+    reader.readAsText(file);
+
+  };
 
 }
 
