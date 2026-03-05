@@ -200,11 +200,10 @@ const lon=130.40;
 const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
 
 const res=await fetch(url);
-const data=await res.json();
+const weatherData=await res.json();
 
-const temp=data.current_weather.temperature;
-const code=data.current_weather.weathercode;
-
+const temp=weatherData.current_weather.temperature;
+const code=weatherData.current_weather.weathercode;
 const weatherMap={
 0:"快晴 ☀️",
 1:"晴れ 🌤",
