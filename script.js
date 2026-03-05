@@ -286,6 +286,28 @@ fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www3.nhk.or.jp/rss/n
   })
 
 })
+  fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www3.nhk.or.jp/rss/news/cat0.xml")
+.then(res => res.json())
+.then(data => {
+
+const list = document.getElementById("news-list")
+
+data.items.slice(0,6).forEach(news => {
+
+const div = document.createElement("div")
+div.className = "news-item"
+
+div.innerHTML = `
+<a href="${news.link}" target="_blank">
+${news.title}
+</a>
+`
+
+list.appendChild(div)
+
+})
+
+})
   
 
 </script>
