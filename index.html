@@ -93,6 +93,23 @@ background:#ef4444;
 margin-top:20px;
 }
 
+#news-box{
+  background: rgba(255,255,255,0.8);
+  padding:10px;
+  border-radius:10px;
+  width:300px;
+}
+
+#news-list{
+  list-style:none;
+  padding:0;
+}
+
+#news-list li{
+  margin:5px 0;
+  font-size:14px;
+}
+
 </style>
 </head>
 
@@ -134,6 +151,10 @@ margin-top:20px;
 
 <input type="file" id="imageUpload" accept="image/*">
 
+</div>
+  <div id="news-box">
+  <h2>ニュース</h2>
+  <ul id="news-list"></ul>
 </div>
 
 <script>
@@ -407,6 +428,23 @@ localStorage.setItem("wallpaperImage",img);
 reader.readAsDataURL(file);
 
 };
+fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www3.nhk.or.jp/rss/news/cat0.xml")
+.then(res => res.json())
+.then(data => {
+
+  const list = document.getElementById("news-list")
+
+  data.items.slice(0,5).forEach(news => {
+
+    const li = document.createElement("li")
+
+    li.innerHTML = `<a href="${news.link}" target="_blank">${news.title}</a>`
+
+    list.appendChild(li)
+
+  })
+
+})
   
 
 </script>
