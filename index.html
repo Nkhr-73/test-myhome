@@ -96,6 +96,7 @@ button:hover{
 
 <button onclick="addCategory()">カテゴリー追加</button>
 <button onclick="addLink()">リンク追加</button>
+<button onclick="showBackups()">バックアップ</button>
 
 
 <div id="categories"></div>
@@ -211,40 +212,38 @@ function addLink(){
   render();
 
 }
-  function backupData(){
 
-  const json = JSON.stringify(data);
 
-  const blob = new Blob([json], {type:"application/json"});
+function showBackups(){
 
-  const url = URL.createObjectURL(blob);
+  const backups = JSON.parse(localStorage.getItem(BACKUP_KEY)) || [];
 
-  const a = document.createElement("a");
+  if(backups.length === 0){
+    alert("バックアップなし");
+    return;
+  }
 
-  a.href = url;
-  a.download = "myhome-backup.json";
+  let text = "復元する番号を入力\n\n";
 
-  a.click();
+  backups.forEach((b,i)=>{
+    text += `${i+1} : ${b.time}\n`;
+  });
+
+  const num = prompt(text);
+
+  if(!num) return;
+
+  const backup = backups[num-1];
+
+  if(!backup) return;
+
+  data = backup.data;
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+  render();
 
 }
-
-function restoreData(){
-
-  const input = document.getElementById("fileInput");
-
-  input.click();
-
-  input.onchange = function(){
-
-    const file = input.files[0];
-
-    const reader = new FileReader();
-
-    reader.onload = function(){
-
-      data = JSON.parse(reader.result);
-
-      save();
       render();
 
     };
