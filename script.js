@@ -1,5 +1,3 @@
-<script>
-
 const STORAGE_KEY="myhome_data";
 const BACKUP_KEY="myhome_backups";
 
@@ -308,6 +306,3 @@ list.appendChild(div)
 })
 
 })
-  
-
-</script>
