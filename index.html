@@ -96,19 +96,34 @@ button:hover{
 
 <button onclick="addCategory()">カテゴリー追加</button>
 <button onclick="addLink()">リンク追加</button>
-<button onclick="backupData()">バックアップ保存</button>
-<button onclick="restoreData()">バックアップ復元</button>
-<input type="file" id="fileInput" style="display:none">
+
 
 <div id="categories"></div>
 
 <script>
+const STORAGE_KEY = "myhome_data";
+const BACKUP_KEY = "myhome_backups";
 
 const STORAGE_KEY="myhome_links";
 let data=JSON.parse(localStorage.getItem(STORAGE_KEY))||{};
 
 function save(){
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+  let backups = JSON.parse(localStorage.getItem(BACKUP_KEY)) || [];
+
+  backups.unshift({
+    time: new Date().toLocaleString(),
+    data: JSON.parse(JSON.stringify(data))
+  });
+
+  if(backups.length > 5){
+    backups.pop();
+  }
+
+  localStorage.setItem(BACKUP_KEY, JSON.stringify(backups));
+
 }
 
 function render(){
