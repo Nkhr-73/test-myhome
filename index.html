@@ -1,272 +1,197 @@
-/*
-Simple Photo Send/Receive Web App (React single-file)
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Home</title>
 
-What this does:
-- Anonymous sign-in with Firebase Auth
-- Upload photos to Firebase Storage
-- Save photo metadata to Firestore
-- Realtime gallery: new uploads appear live for all clients
-- Copy link / open image / basic progress indicator
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-Setup (quick):
-1) Create a Firebase project: https://console.firebase.google.com/
-2) Enable Firestore (Native) and Firebase Storage.
-3) In Authentication -> Sign-in method -> enable Anonymous.
-4) Set basic security rules for development (change for production):
-   - Firestore rules (allow read/write if request.auth != null)
-   - Storage rules (allow read/write if request.auth != null)
-5) Install dependencies in a React app (Vite recommended):
-   ```bash
-   npm create vite@latest my-photo-app -- --template react
-   cd my-photo-app
-   npm install
-   npm install firebase
-   # Tailwind (optional) - follow Tailwind docs to set up
-   ```
-6) Replace the App.jsx / App.tsx content with this file, or import it.
-7) Paste your Firebase config into firebaseConfig below.
+<style>
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #1e1e2f, #2c2c3e);
+  color: white;
+}
 
-Important: This is meant as a starter. For production you must secure rules,
-add image validation, size limits, rate limits, and user features.
-*/
+.container {
+  padding: 40px;
+}
 
-import React, { useEffect, useState, useRef } from "react";
-import { initializeApp } from "firebase/app";
-import {
-  getAuth,
-  signInAnonymously,
-  onAuthStateChanged
-} from "firebase/auth";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  serverTimestamp,
-  query,
-  orderBy,
-  onSnapshot
-} from "firebase/firestore";
-import {
-  getStorage,
-  ref as storageRef,
-  uploadBytesResumable,
-  getDownloadURL
-} from "firebase/storage";
+.category {
+  margin-bottom: 30px;
+}
 
-// --- PASTE YOUR FIREBASE CONFIG HERE ---
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-// ---------------------------------------
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+.category-title {
+  font-size: 22px;
+  font-weight: 600;
+}
 
-export default function App() {
-  const [user, setUser] = useState(null);
-  const [files, setFiles] = useState([]); // local selected files
-  const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [gallery, setGallery] = useState([]);
-  const fileInputRef = useRef(null);
+.delete-category {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #ff6b6b;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
 
-  useEffect(() => {
-    // anonymous sign-in
-    signInAnonymously(auth).catch((err) => {
-      console.error("Auth error:", err);
-    });
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-    });
-    return () => unsub();
-  }, []);
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
 
-  useEffect(() => {
-    // realtime listener for photos collection
-    const q = query(
-      collection(db, "photos"),
-      orderBy("createdAt", "desc")
-    );
-    const unsub = onSnapshot(q, (snap) => {
-      const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setGallery(items);
-    });
-    return () => unsub();
-  }, []);
+.link-card {
+  background: rgba(255,255,255,0.1);
+  padding: 10px 15px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: white;
+  transition: 0.2s;
+}
 
-  const handleSelect = (e) => {
-    setFiles(Array.from(e.target.files || []));
-  };
+.link-card:hover {
+  background: rgba(255,255,255,0.2);
+}
 
-  const uploadAll = async () => {
-    if (!files.length || !user) return;
-    setUploading(true);
-    try {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const path = `photos/${user.uid}/${Date.now()}_${file.name}`;
-        const sRef = storageRef(storage, path);
-        const uploadTask = uploadBytesResumable(sRef, file);
+.control-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
 
-        // wait for upload and update progress
-        await new Promise((resolve, reject) => {
-          uploadTask.on(
-            "state_changed",
-            (snapshot) => {
-              const pct = Math.round(
-                (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-              );
-              setProgress(pct);
-            },
-            (err) => {
-              console.error("Upload error:", err);
-              reject(err);
-            },
-            async () => {
-              const url = await getDownloadURL(uploadTask.snapshot.ref);
-              // save metadata to Firestore
-              await addDoc(collection(db, "photos"), {
-                owner: user.uid,
-                name: file.name,
-                url,
-                size: file.size,
-                contentType: file.type,
-                createdAt: serverTimestamp()
-              });
-              resolve();
-            }
-          );
-        });
+button {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="container" id="app"></div>
+
+<div class="control-panel">
+  <button onclick="addCategory()">カテゴリー追加</button>
+  <button onclick="addLink()">リンク追加</button>
+</div>
+
+<script>
+const STORAGE_KEY = "myHomeData_v2";
+const BACKUP_KEY = "myHomeBackup_v2";
+
+let saved = localStorage.getItem(STORAGE_KEY);
+let data;
+
+if (saved) {
+  data = JSON.parse(saved);
+} else {
+  data = { "お気に入り": [] };
+  save();
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  localStorage.setItem(BACKUP_KEY, JSON.stringify(data));
+}
+
+function render() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+
+  for (let category in data) {
+    const categoryDiv = document.createElement("div");
+    categoryDiv.className = "category";
+
+    const header = document.createElement("div");
+    header.className = "category-header";
+
+    const title = document.createElement("div");
+    title.className = "category-title";
+    title.textContent = category;
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-category";
+    deleteBtn.textContent = "削除";
+    deleteBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (confirm("このカテゴリーを削除しますか？")) {
+        delete data[category];
+        save();
+        render();
       }
-      // done
-      setFiles([]);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    } catch (e) {
-      console.error(e);
-      alert("Upload failed. Check console.");
-    }
-    setProgress(0);
-    setUploading(false);
-  };
+    };
 
-  const humanDate = (ts) => {
-    if (!ts) return "-";
-    try {
-      const d = ts.toDate ? ts.toDate() : new Date(ts);
-      return d.toLocaleString();
-    } catch (e) {
-      return "-";
-    }
-  };
+    header.appendChild(title);
+    header.appendChild(deleteBtn);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-sky-50 p-6 font-sans">
-      <div className="max-w-4xl mx-auto">
-        <header className="mb-6">
-          <h1 className="text-3xl font-bold">Photo Send & Receive</h1>
-          <p className="text-sm opacity-80 mt-1">
-            匿名で接続、アップロードするとリアルタイムでギャラリーに表示されます。
-          </p>
-        </header>
+    const linksDiv = document.createElement("div");
+    linksDiv.className = "links";
 
-        <section className="mb-6 bg-white p-4 rounded-2xl shadow">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <div className="text-xs text-gray-500">あなたのユーザID</div>
-              <div className="font-mono text-sm">{user ? user.uid : "サインイン中..."}</div>
-            </div>
+    title.onclick = () => {
+      linksDiv.style.display =
+        linksDiv.style.display === "none" ? "flex" : "none";
+    };
 
-            <div className="flex items-center gap-3">
-              <input
-                ref={fileInputRef}
-                onChange={handleSelect}
-                multiple
-                accept="image/*"
-                type="file"
-                className="hidden"
-                id="file-input"
-              />
-              <label htmlFor="file-input" className="cursor-pointer">
-                <button className="px-4 py-2 bg-sky-600 text-white rounded-xl shadow">画像を選択</button>
-              </label>
+    data[category].forEach(link => {
+      const a = document.createElement("a");
+      a.href = link.url;
+      a.textContent = link.name;
+      a.className = "link-card";
+      a.target = "_blank";
+      linksDiv.appendChild(a);
+    });
 
-              <button
-                onClick={uploadAll}
-                disabled={!files.length || uploading}
-                className="px-4 py-2 bg-green-500 text-white rounded-xl shadow disabled:opacity-50"
-              >
-                {uploading ? `アップロード中 (${progress}%)` : "まとめて送る"}
-              </button>
-            </div>
-          </div>
-
-          {files.length > 0 && (
-            <div className="mt-4 grid grid-cols-3 gap-2">
-              {files.map((f, idx) => (
-                <div key={idx} className="p-1 border rounded">
-                  <div className="text-xs font-medium truncate">{f.name}</div>
-                  <div className="text-xs opacity-60">{Math.round(f.size / 1024)} KB</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="mb-6">
-          <h2 className="text-lg font-semibold mb-2">ギャラリー (リアルタイム)</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {gallery.map((item) => (
-              <div key={item.id} className="bg-white rounded-xl p-2 shadow">
-                <div className="aspect-w-4 aspect-h-3">
-                  <img
-                    src={item.url}
-                    alt={item.name || "photo"}
-                    className="object-cover w-full h-full rounded"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="mt-2 text-sm">
-                  <div className="font-medium truncate">{item.name}</div>
-                  <div className="text-xs opacity-70">{humanDate(item.createdAt)}</div>
-                  <div className="mt-2 flex gap-2">
-                    <a href={item.url} target="_blank" rel="noreferrer" className="text-xs underline">
-                      開く
-                    </a>
-                    <CopyLinkButton text={item.url} />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <footer className="text-xs opacity-70 mt-8">※ 開発用サンプルです。運用時はセキュリティ強化をしてね。</footer>
-      </div>
-    </div>
-  );
-}
-
-function CopyLinkButton({ text }) {
-  const [copied, setCopied] = useState(false);
-  async function doCopy() {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch (e) {
-      alert("クリップボードにコピーできませんでした。");
-    }
+    categoryDiv.appendChild(header);
+    categoryDiv.appendChild(linksDiv);
+    app.appendChild(categoryDiv);
   }
-  return (
-    <button onClick={doCopy} className="text-xs px-2 py-1 border rounded">
-      {copied ? "コピー済" : "リンクをコピー"}
-    </button>
-  );
 }
+
+function addCategory() {
+  const name = prompt("カテゴリー名を入力");
+  if (!name) return;
+  if (data[name]) {
+    alert("すでに存在します");
+    return;
+  }
+  data[name] = [];
+  save();
+  render();
+}
+
+function addLink() {
+  const category = prompt("追加するカテゴリー名");
+  if (!data[category]) {
+    alert("そのカテゴリーは存在しません");
+    return;
+  }
+
+  const name = prompt("リンク名");
+  const url = prompt("URL");
+  if (!name || !url) return;
+
+  data[category].push({ name, url });
+  save();
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
