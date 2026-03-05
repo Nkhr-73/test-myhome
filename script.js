@@ -1,20 +1,22 @@
+document.addEventListener("DOMContentLoaded", () => {
+
 const STORAGE_KEY="myhome_data";
 const BACKUP_KEY="myhome_backups";
 
-let data=JSON.parse(localStorage.getItem(STORAGE_KEY))||{};
+let linkData=JSON.parse(localStorage.getItem(STORAGE_KEY))||{};
 
 const categoriesDiv=document.getElementById("categories");
 const categorySelect=document.getElementById("categorySelect");
 
 function save(){
 
-localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+localStorage.setItem(STORAGE_KEY,JSON.stringify(linkData));
 
 let backups=JSON.parse(localStorage.getItem(BACKUP_KEY))||[];
 
 backups.unshift({
 time:new Date().toLocaleString(),
-data:JSON.parse(JSON.stringify(data))
+data:JSON.parse(JSON.stringify(linkData))
 });
 
 if(backups.length>5)backups.pop();
@@ -28,7 +30,7 @@ function render(){
 categoriesDiv.innerHTML="";
 categorySelect.innerHTML="";
 
-for(let category in data){
+for(let category in linkData){
 
 const catDiv=document.createElement("div");
 catDiv.className="category";
@@ -44,7 +46,7 @@ linksDiv.style.display=
 linksDiv.style.display==="none"?"flex":"none";
 };
 
-data[category].forEach((link,index)=>{
+linkData[category].forEach((link,index)=>{
 
 const item=document.createElement("div");
 item.className="link-item";
@@ -59,7 +61,7 @@ del.textContent="削除";
 del.className="delete-btn";
 
 del.onclick=()=>{
-data[category].splice(index,1);
+linkData[category].splice(index,1);
 save();
 render();
 };
@@ -84,15 +86,15 @@ categorySelect.appendChild(option);
 
 }
 
-function addCategory(){
+window.addCategory=function(){
 
 const name=prompt("カテゴリー名");
 
 if(!name)return;
 
-if(!data[name]){
+if(!linkData[name]){
 
-data[name]=[];
+linkData[name]=[];
 
 save();
 render();
@@ -101,7 +103,7 @@ render();
 
 }
 
-function addLink(){
+window.addLink=function(){
 
 const name=document.getElementById("linkName").value;
 const url=document.getElementById("linkURL").value;
@@ -109,7 +111,7 @@ const cat=categorySelect.value;
 
 if(!name||!url||!cat)return;
 
-data[cat].push({name,url});
+linkData[cat].push({name,url});
 
 save();
 render();
@@ -119,7 +121,7 @@ document.getElementById("linkURL").value="";
 
 }
 
-function toggleEditor(){
+window.toggleEditor=function(){
 
 const panel=document.getElementById("editorPanel");
 
@@ -128,7 +130,7 @@ panel.style.display==="none"?"block":"none";
 
 }
 
-function showBackups(){
+window.showBackups=function(){
 
 const backups=JSON.parse(localStorage.getItem(BACKUP_KEY))||[];
 
@@ -137,7 +139,7 @@ alert("バックアップなし");
 return;
 }
 
-let text="復元する番号を入力\n\n";
+let text="復元する番号\n\n";
 
 backups.forEach((b,i)=>{
 text+=`${i+1} : ${b.time}\n`;
@@ -151,21 +153,9 @@ const backup=backups[num-1];
 
 if(!backup)return;
 
-data=backup.data;
+linkData=backup.data;
 
-localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
-  const savedColor=localStorage.getItem("wallpaperColor");
-const savedImage=localStorage.getItem("wallpaperImage");
-
-if(savedImage){
-
-document.body.style.background=`url(${savedImage}) center/cover no-repeat fixed`;
-
-}else if(savedColor){
-
-document.body.style.background=savedColor;
-
-}
+localStorage.setItem(STORAGE_KEY,JSON.stringify(linkData));
 
 render();
 
@@ -191,8 +181,9 @@ now.toLocaleDateString("ja-JP",options);
 setInterval(updateClock,1000);
 updateClock();
 
-render();
 async function updateWeather(){
+
+try{
 
 const lat=33.59;
 const lon=130.40;
@@ -204,6 +195,7 @@ const weatherData=await res.json();
 
 const temp=weatherData.current_weather.temperature;
 const code=weatherData.current_weather.weathercode;
+
 const weatherMap={
 0:"快晴 ☀️",
 1:"晴れ 🌤",
@@ -222,12 +214,18 @@ const weather=weatherMap[code]||"天気";
 document.getElementById("weather").textContent=
 `福岡 ${weather} ${temp}°C`;
 
+}catch(e){
+
+document.getElementById("weather").textContent="天気取得失敗";
+
+}
+
 }
 
 updateWeather();
 setInterval(updateWeather,600000);
 
-function toggleWallpaper(){
+window.toggleWallpaper=function(){
 
 const panel=document.getElementById("wallpaperPanel");
 
@@ -238,6 +236,8 @@ panel.style.display==="none"?"block":"none";
 
 const colorPicker=document.getElementById("colorPicker");
 
+if(colorPicker){
+
 colorPicker.oninput=function(){
 
 document.body.style.background=colorPicker.value;
@@ -246,7 +246,11 @@ localStorage.setItem("wallpaperColor",colorPicker.value);
 
 };
 
+}
+
 const imageUpload=document.getElementById("imageUpload");
+
+if(imageUpload){
 
 imageUpload.onchange=function(e){
 
@@ -265,25 +269,56 @@ localStorage.setItem("wallpaperImage",img);
 
 reader.readAsDataURL(file);
 
-  fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www3.nhk.or.jp/rss/news/cat0.xml")
-.then(res => res.json())
-.then(data => {
+};
 
-const list = document.getElementById("news-list")
+}
 
-data.items.slice(0,6).forEach(news => {
+const savedColor=localStorage.getItem("wallpaperColor");
+const savedImage=localStorage.getItem("wallpaperImage");
 
-const div = document.createElement("div")
-div.className = "news-item"
+if(savedImage){
 
-div.innerHTML = `
+document.body.style.background=`url(${savedImage}) center/cover no-repeat fixed`;
+
+}else if(savedColor){
+
+document.body.style.background=savedColor;
+
+}
+
+function loadNews(){
+
+fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www3.nhk.or.jp/rss/news/cat0.xml")
+.then(res=>res.json())
+.then(newsData=>{
+
+const list=document.getElementById("news-list");
+
+if(!list)return;
+
+list.innerHTML="";
+
+newsData.items.slice(0,6).forEach(news=>{
+
+const div=document.createElement("div");
+div.className="news-item";
+
+div.innerHTML=`
 <a href="${news.link}" target="_blank">
 ${news.title}
 </a>
-`
+`;
 
-list.appendChild(div)
+list.appendChild(div);
 
-})
+});
 
-})
+});
+
+}
+
+loadNews();
+
+render();
+
+});
