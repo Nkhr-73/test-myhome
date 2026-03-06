@@ -3,6 +3,18 @@ document.addEventListener("DOMContentLoaded", () => {
 const STORAGE_KEY="myhome_data";
 const BACKUP_KEY="myhome_backups";
 
+const icon = document.createElement("img");
+icon.className = "site-icon";
+
+const domain = new URL(site.url).hostname;
+icon.src = "https://www.google.com/s2/favicons?domain=" + domain + "&sz=64";
+
+const title = document.createElement("span");
+title.textContent = site.name;
+
+card.appendChild(icon);
+card.appendChild(title);
+
 let linkData=JSON.parse(localStorage.getItem(STORAGE_KEY))||{};
 
 const categoriesDiv=document.getElementById("categories");
