@@ -3,15 +3,59 @@ document.addEventListener("DOMContentLoaded", () => {
 const STORAGE_KEY="myhome_data";
 const BACKUP_KEY="myhome_backups";
 
-const icon = document.createElement("img");
-icon.className = "site-icon";
+const STORAGE_KEY="myhome_sites";
 
-const domain = new URL(site.url).hostname;
-icon.src = "https://www.google.com/s2/favicons?domain=" + domain + "&sz=64";
+let sites=JSON.parse(localStorage.getItem(STORAGE_KEY))||[];
 
-const title = document.createElement("span");
-title.textContent = site.name;
+const container=document.getElementById("sites");
 
+function saveSites(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(sites));
+}
+
+function renderSites(){
+
+  container.innerHTML="";
+
+  sites.forEach(site=>{
+
+    const card=document.createElement("div");
+    card.className="site-card";
+
+    const icon=document.createElement("img");
+    icon.className="site-icon";
+
+    const domain=new URL(site.url).hostname;
+
+    icon.src="https://www.google.com/s2/favicons?domain="+domain+"&sz=64";
+
+    const title=document.createElement("div");
+    title.textContent=site.name;
+
+    card.appendChild(icon);
+    card.appendChild(title);
+
+    card.onclick=()=>{
+      window.open(site.url,"_blank");
+    };
+
+    container.appendChild(card);
+
+  });
+
+}
+
+function addSite(name,url){
+
+  sites.push({name,url});
+
+  saveSites();
+
+  renderSites();
+
+}
+
+renderSites();
 card.appendChild(icon);
 card.appendChild(title);
 
