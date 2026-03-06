@@ -116,17 +116,30 @@ text-decoration:none;
 font-weight:500;
 }
 
+#sites{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,80px);
+  gap:12px;
+}
+
 .site-card{
+  width:80px;
+  height:80px;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:6px;
+  background:white;
+  border-radius:12px;
+  cursor:pointer;
+  text-align:center;
+  font-size:12px;
 }
 
 .site-icon{
   width:32px;
   height:32px;
+  margin-bottom:4px;
 }
 
 </style>
