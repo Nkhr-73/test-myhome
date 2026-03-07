@@ -298,6 +298,9 @@ function loadNews(){
 fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www3.nhk.or.jp/rss/news/cat0.xml")
 .then(res=>res.json())
 .then(newsData=>{
+.catch(()=>{
+document.getElementById("news-list").innerHTML="ニュース取得失敗";
+});
 
 const list=document.getElementById("news-list");
 
