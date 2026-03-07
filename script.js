@@ -53,9 +53,16 @@ item.className="link-item";
 
 const a=document.createElement("a");
 a.href=link.url;
-a.textContent=link.name;
 a.target="_blank";
 
+const icon=document.createElement("img");
+icon.src="https://www.google.com/s2/favicons?sz=64&domain="+link.url;
+
+const text=document.createElement("span");
+text.textContent=link.name;
+
+a.appendChild(icon);
+a.appendChild(text);
 const del=document.createElement("button");
 del.textContent="削除";
 del.className="delete-btn";
