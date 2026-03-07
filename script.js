@@ -55,14 +55,19 @@ const a=document.createElement("a");
 a.href=link.url;
 a.target="_blank";
 
+const iconBox=document.createElement("div");
+iconBox.className="link-icon";
+
 const icon=document.createElement("img");
 icon.src="https://www.google.com/s2/favicons?sz=64&domain="+link.url;
 
-const text=document.createElement("span");
-text.textContent=link.name;
+iconBox.appendChild(icon);
+a.appendChild(iconBox);
 
-a.appendChild(icon);
-a.appendChild(text);
+const name=document.createElement("div");
+name.className="link-name";
+name.textContent=link.name;
+  
 const del=document.createElement("button");
 del.textContent="削除";
 del.className="delete-btn";
