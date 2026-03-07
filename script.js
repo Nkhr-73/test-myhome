@@ -329,3 +329,8 @@ loadNews();
 render();
 
 });
+document.getElementById("linkURL").addEventListener("keypress",function(e){
+if(e.key==="Enter"){
+addLink();
+}
+});
