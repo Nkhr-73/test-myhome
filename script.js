@@ -342,3 +342,6 @@ if(e.key==="Enter"){
 addLink();
 }
 });
+item.appendChild(a);
+item.appendChild(name);
+item.appendChild(del);
