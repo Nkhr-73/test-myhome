@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
 
 const STORAGE_KEY="myhome_data";
@@ -7,6 +8,9 @@ let linkData=JSON.parse(localStorage.getItem(STORAGE_KEY))||{};
 
 const categoriesDiv=document.getElementById("categories");
 const categorySelect=document.getElementById("categorySelect");
+
+
+/* 保存 */
 
 function save(){
 
@@ -24,6 +28,9 @@ if(backups.length>5)backups.pop();
 localStorage.setItem(BACKUP_KEY,JSON.stringify(backups));
 
 }
+
+
+/* 描画 */
 
 function render(){
 
@@ -67,7 +74,7 @@ a.appendChild(iconBox);
 const name=document.createElement("div");
 name.className="link-name";
 name.textContent=link.name;
-  
+
 const del=document.createElement("button");
 del.textContent="削除";
 del.className="delete-btn";
@@ -79,7 +86,9 @@ render();
 };
 
 item.appendChild(a);
+item.appendChild(name);
 item.appendChild(del);
+
 linksDiv.appendChild(item);
 
 });
@@ -98,6 +107,9 @@ categorySelect.appendChild(option);
 
 }
 
+
+/* カテゴリー追加 */
+
 window.addCategory=function(){
 
 const name=prompt("カテゴリー名");
@@ -115,13 +127,22 @@ render();
 
 }
 
+
+/* リンク追加 */
+
 window.addLink=function(){
 
 const name=document.getElementById("linkName").value;
-const url=document.getElementById("linkURL").value;
+
+let url=document.getElementById("linkURL").value;
+
 const cat=categorySelect.value;
 
 if(!name||!url||!cat)return;
+
+if(!url.startsWith("http")){
+url="https://"+url;
+}
 
 linkData[cat].push({name,url});
 
@@ -133,6 +154,18 @@ document.getElementById("linkURL").value="";
 
 }
 
+
+/* Enter追加 */
+
+document.getElementById("linkURL").addEventListener("keypress",function(e){
+if(e.key==="Enter"){
+addLink();
+}
+});
+
+
+/* エディタ */
+
 window.toggleEditor=function(){
 
 const panel=document.getElementById("editorPanel");
@@ -141,6 +174,9 @@ panel.style.display=
 panel.style.display==="none"?"block":"none";
 
 }
+
+
+/* バックアップ */
 
 window.showBackups=function(){
 
@@ -173,6 +209,9 @@ render();
 
 }
 
+
+/* 時計 */
+
 function updateClock(){
 
 const now=new Date();
@@ -192,6 +231,9 @@ now.toLocaleDateString("ja-JP",options);
 
 setInterval(updateClock,1000);
 updateClock();
+
+
+/* 天気 */
 
 async function updateWeather(){
 
@@ -236,6 +278,9 @@ document.getElementById("weather").textContent="天気取得失敗";
 
 updateWeather();
 setInterval(updateWeather,600000);
+
+
+/* 壁紙 */
 
 window.toggleWallpaper=function(){
 
@@ -298,14 +343,16 @@ document.body.style.background=savedColor;
 
 }
 
+
+/* ニュース */
+
 function loadNews(){
 
 fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www3.nhk.or.jp/rss/news/cat0.xml")
+
 .then(res=>res.json())
+
 .then(newsData=>{
-.catch(()=>{
-document.getElementById("news-list").innerHTML="ニュース取得失敗";
-});
 
 const list=document.getElementById("news-list");
 
@@ -328,20 +375,19 @@ list.appendChild(div);
 
 });
 
+})
+
+.catch(()=>{
+document.getElementById("news-list").innerHTML="ニュース取得失敗";
 });
 
 }
 
 loadNews();
 
+
+/* 初期描画 */
+
 render();
 
 });
-document.getElementById("linkURL").addEventListener("keypress",function(e){
-if(e.key==="Enter"){
-addLink();
-}
-});
-item.appendChild(a);
-item.appendChild(name);
-item.appendChild(del);
