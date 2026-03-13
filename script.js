@@ -390,4 +390,13 @@ loadNews();
 
 render();
 
+/*カーソル表示*/
+  
+const searchInput=document.getElementById("searchInput");
+
+if(searchInput){
+searchInput.value="";
+searchInput.focus();
+}
+  
 });
