@@ -192,6 +192,10 @@ font-weight:500;
   padding-left: 100%;
   animation: scrollNews 20s linear infinite;
 }
+#news-track a:hover {
+  text-decoration: underline;
+  opacity: 0.8;
+}
 
 @keyframes scrollNews {
   from { transform: translateX(0); }
