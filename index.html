@@ -34,6 +34,110 @@
 
 <h2>News</h2>
 
+<div id="news-list"></div>
+
+</section>
+
+
+<!-- 操作ボタン -->
+
+<section id="controls">
+
+<button onclick="addCategory()">カテゴリー追加</button>
+<button onclick="toggleEditor()">リンク追加</button>
+<button onclick="showBackups()">バックアップ</button>
+<button onclick="toggleWallpaper()">壁紙</button>
+
+</section>
+
+
+<!-- リンク追加パネル -->
+
+<section id="editorPanel" style="display:none">
+
+<h3>リンク追加</h3>
+
+<input id="linkName" placeholder="サイト名">
+
+<input id="linkURL" placeholder="URL">
+
+<select id="categorySelect"></select>
+
+<button onclick="addLink()">追加</button>
+
+</section>
+
+
+<!-- カテゴリー -->
+
+<main id="categories"></main>
+
+
+<!-- 壁紙 -->
+
+<section id="wallpaperPanel" style="display:none">
+
+<h3>単色背景</h3>
+
+<input type="color" id="colorPicker">
+
+<br><br>
+
+<h3>画像背景</h3>
+
+<input type="file" id="imageUpload" accept="image/*">
+
+</section>
+
+
+<footer>
+
+<a href="terms">利用約款</a>
+
+</footer>
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MY-home</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+</head>
+
+
+<body>
+
+<header>
+
+<h1>MY-home</h1>
+
+<div id="clock"></div>
+<div id="date"></div>
+<div id="weather"></div>
+
+</header>
+
+
+<!-- News -->
+
+<section id="news-box">
+
+<h2>News</h2>
+
 <div id="news-container">
   <div id="news-track"></div>
 </div>
