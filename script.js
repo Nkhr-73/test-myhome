@@ -347,44 +347,38 @@ document.body.style.background=savedColor;
 
 /* ニュース */
 
-function loadNews(){
+let newsList = [];
+let index = 0;
+
+const news1 = document.getElementById("news1");
+const news2 = document.getElementById("news2");
 
 fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www3.nhk.or.jp/rss/news/cat0.xml")
+  .then(res => res.json())
+  .then(data => {
+    newsList = data.items;
+    showNews();
+    setInterval(nextNews, 5000);
+  })
+  .catch(err => {
+    console.error(err);
+    news1.textContent = "ニュース取得失敗";
+  });
 
-.then(res=>res.json())
+function showNews() {
+  if (newsList.length === 0) return;
 
-.then(newsData=>{
+  const item1 = newsList[index % newsList.length];
+  const item2 = newsList[(index + 1) % newsList.length];
 
-const list=document.getElementById("news-list");
-
-if(!list)return;
-
-list.innerHTML="";
-
-newsData.items.slice(0,6).forEach(news=>{
-
-const div=document.createElement("div");
-div.className="news-item";
-
-div.innerHTML=`
-<a href="${news.link}" target="_blank">
-${news.title}
-</a>
-`;
-
-list.appendChild(div);
-
-});
-
-})
-
-.catch(()=>{
-document.getElementById("news-list").innerHTML="ニュース取得失敗";
-});
-
+  news1.innerHTML = `<a href="${item1.link}" target="_blank">${item1.title}</a>`;
+  news2.innerHTML = `<a href="${item2.link}" target="_blank">${item2.title}</a>`;
 }
 
-loadNews();
+function nextNews() {
+  index += 2;
+  showNews();
+}
 
 
 /* 初期描画 */
