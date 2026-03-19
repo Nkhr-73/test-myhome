@@ -379,7 +379,17 @@ function nextNews() {
   index += 2;
   showNews();
 }
+function nextNews() {
+  news1.style.opacity = 0;
+  news2.style.opacity = 0;
 
+  setTimeout(() => {
+    index += 2;
+    showNews();
+    news1.style.opacity = 1;
+    news2.style.opacity = 1;
+  }, 400);
+}
 
 /* 初期描画 */
 
