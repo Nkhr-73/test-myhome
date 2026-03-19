@@ -1,4 +1,5 @@
 
+
 document.addEventListener("DOMContentLoaded", () => {
 
 const STORAGE_KEY="myhome_data";
@@ -384,12 +385,6 @@ document.getElementById("news-list").innerHTML="ニュース取得失敗";
 }
 
 loadNews();
-
-
-/* 初期描画 */
-
-render();
-  
 
 
 /* 初期描画 */
