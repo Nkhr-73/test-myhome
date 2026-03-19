@@ -353,7 +353,7 @@ let index = 0;
 const news1 = document.getElementById("news1");
 const news2 = document.getElementById("news2");
 
-fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www3.nhk.or.jp/rss/news/cat0.xml")
+fetch("https://api.rss2json.com/v1/api.json?rss_url=https://news.yahoo.co.jp/rss/topics/top-picks.xml")
   .then(res => res.json())
   .then(data => {
     newsList = data.items;
