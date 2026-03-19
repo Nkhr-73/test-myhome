@@ -346,44 +346,29 @@ document.body.style.background=savedColor;
 
 /* ニュース */
 
-function loadNews(){
+const track = document.getElementById("news-track");
 
+// RSS → JSONに変換して取得（NHKニュース）
 fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www3.nhk.or.jp/rss/news/cat0.xml")
+  .then(res => res.json())
+  .then(data => {
+    data.items.slice(0, 10).forEach(item => {
+      const span = document.createElement("span");
+      span.innerHTML = `
+        <a href="${item.link}" target="_blank" style="color:white; text-decoration:none;">
+          ${item.title}
+        </a>
+        　◆　
+      `;
+      track.appendChild(span);
+    });
+  })
+  .catch(err => {
+    console.error("ニュース取得失敗", err);
 
-.then(res=>res.json())
-
-.then(newsData=>{
-
-const list=document.getElementById("news-list");
-
-if(!list)return;
-
-list.innerHTML="";
-
-newsData.items.slice(0,6).forEach(news=>{
-
-const div=document.createElement("div");
-div.className="news-item";
-
-div.innerHTML=`
-<a href="${news.link}" target="_blank">
-${news.title}
-</a>
-`;
-
-list.appendChild(div);
-
-});
-
-})
-
-.catch(()=>{
-document.getElementById("news-list").innerHTML="ニュース取得失敗";
-});
-
-}
-
-loadNews();
+    // 失敗時の保険
+    track.textContent = "ニュースの取得に失敗しました";
+  });
 
 
 /* 初期描画 */
