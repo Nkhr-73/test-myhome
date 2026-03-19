@@ -31,64 +31,81 @@ color:white;
 text-decoration:none;
 border-radius:6px;
 }
+  .tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: #333;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.tabs button:hover {
+  background: #555;
+}
+
+.tab-content {
+  background: rgba(0,0,0,0.6);
+  padding: 15px;
+  border-radius: 10px;
+}
 </style>
 </head>
 
 <body>
 
-<h1>MY-home 利用約款</h1>
+<section id="terms">
 
-<div class="section">
-<h2>1. サービスについて</h2>
-<p>
-MY-homeは、ユーザーが自分の好きなサイトへ簡単にアクセスするためのホームページサービスです。
-</p>
-</div>
+  <h1>MY-home</h1>
 
-<div class="section">
-<h2>2. データ保存について</h2>
-<p>
-登録されたリンクなどのデータはブラウザのLocalStorageに保存されます。
-そのため、ブラウザを変更した場合などはデータが引き継がれないことがあります。
-</p>
-</div>
+  <!-- タブ -->
+  <div class="tabs">
+    <button onclick="showTab('terms')">利用規約</button>
+    <button onclick="showTab('privacy')">プライバシー</button>
+    <button onclick="showTab('history')">変更履歴</button>
+  </div>
 
-<div class="section">
-<h2>3. 免責事項</h2>
-<p>
-本サービスの利用によって生じた損害について、開発者は責任を負いません。
-</p>
-</div>
+  <!-- 利用規約 -->
+  <div class="tab-content" id="terms-content">
+    <h2>利用規約</h2>
+    <p>本サービスは自己責任で利用してください。</p>
+  </div>
 
-<div class="section">
-<h2>4. サービスの変更</h2>
-<p>
-MY-homeは予告なく仕様変更・停止することがあります。
-</p>
-</div>
-<div class="section">
-<h2>5.アップデート履歴</h2>
-<p>
-2026 03/05 
-22:31
-News配信機能を追加
-18：25
-googleアナリティクスにて分析開始
-18：15
-Instagramで一般に公開
-18：04
-背景色変更機能と壁紙を写真で反映できる機能を追加
-17：54
-天気を表示する機能を追加
-17：49
-色彩の関係で時計が表示されない問題を修正
-17:40　Ver.1.0.0
-my-homeサイト公開
-バックアップ機能の追加
-</p>
+  <!-- プライバシー -->
+  <div class="tab-content" id="privacy-content" style="display:none;">
+    <h2>プライバシーポリシー</h2>
+    <p>個人情報は収集しません。</p>
+  </div>
+
+  <!-- 変更履歴 -->
+  <div class="tab-content" id="history-content" style="display:none;">
+    <h2>変更履歴</h2>
+    <ul>
+      <li>2026/3/19 初版作成</li>
+    </ul>
+  </div>
+
+</section>
+  
 </div>
   
 <a href="index" class="back">MY-homeに戻る</a>
 
+<script>function showTab(tab) {
+  document.getElementById("terms-content").style.display = "none";
+  document.getElementById("privacy-content").style.display = "none";
+  document.getElementById("history-content").style.display = "none";
+
+  document.getElementById(tab + "-content").style.display = "block";
+}
+</script>
+  
 </body>
 </html>
